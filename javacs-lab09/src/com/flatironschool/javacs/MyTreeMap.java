@@ -1,5 +1,5 @@
 /**
- * 
+ * Edited by Lindsey Gillaspie 
  */
 package com.flatironschool.javacs;
 
@@ -64,16 +64,24 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 	private Node findNode(Object target) {
 		// some implementations can handle null as a key, but not this one
 		if (target == null) {
-            throw new NullPointerException();
-	    }
+            		throw new NullPointerException();
+	    	}
 		
 		// something to make the compiler happy
 		@SuppressWarnings("unchecked")
 		Comparable<? super K> k = (Comparable<? super K>) target;
 		
 		// the actual search
-        // TODO: Fill this in.
-        return null;
+        // Completed this part
+		Node node = root;
+		while(node != null) {
+			int comp = k.compareTo(node.key);
+			if (comp < 0) node = node.left;
+			else if (comp > 0) node = node.right;
+			else return node;
+		}
+
+        	return null;
 	}
 
 	/**
@@ -91,7 +99,30 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 	}
 
 	@Override
+	// Completed this method
 	public boolean containsValue(Object target) {
+		return containsValueHelper(root, target);
+	}
+
+	// Recursive method called in containsValue() that checks
+	// each branch of the node in the tree
+	public boolean containsValueHelper(Node node, Object target) {
+		if (node == null) {
+			return false;
+		}
+
+		if (equals(target, node.value)) {
+			return true;
+		}
+		
+		if (containsValueHelper(node.left, target)) {
+			return true;
+		}
+		
+		if (containsValueHelper(node.right, target)) {
+			return true;
+		}
+
 		return false;
 	}
 
@@ -115,10 +146,21 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 	}
 
 	@Override
+	// Return a Set that iteratres the keys in order
+	// in increasing order according to compareTo method
 	public Set<K> keySet() {
 		Set<K> set = new LinkedHashSet<K>();
-        // TODO: Fill this in.
+        // Completed this method by calling a helper method
+		addInOrder(root, set);
 		return set;
+	}
+
+	// Helper method that adds the key in the middle
+	private void addInOrder(Node node, Set<K> set) {
+		if (node == null) return;
+		addInOrder(node.left, set);
+		set.add(node.key);
+		addInOrder(node.right, set);
 	}
 
 	@Override
@@ -135,8 +177,34 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 	}
 
 	private V putHelper(Node node, K key, V value) {
-        // TODO: Fill this in.
-        return null;
+        // Completed this method
+		@SuppressWarnings("unchecked")
+		Comparable<? super K> k = (Comparable<? super K>) key;
+		int comp = k.compareTo(node.key);
+
+		if (comp < 0) {
+			if (node.left == null) {
+				node.left = new Node(key, value);
+				size++;
+				return null;
+			} else {
+				return putHelper(node.left, key, value);
+			}
+		}
+		
+		if (comp > 0) {
+			if (node.right == null) {
+				node.right = new Node(key, value);
+				size++;
+				return null;
+			} else {
+				return putHelper(node.right, key, value);
+			}
+		}
+		
+		V oldValue = node.value;
+		node.value = value;
+		return oldValue;
 	}
 
 	@Override
